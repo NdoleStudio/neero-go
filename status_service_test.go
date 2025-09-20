@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/NdoleStudio/go-http-client/internal/helpers"
+	"github.com/NdoleStudio/neero-go/internal/helpers"
 	"github.com/stretchr/testify/assert"
 )
 
