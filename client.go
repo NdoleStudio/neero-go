@@ -1,4 +1,4 @@
-package client
+package neero
 
 import (
 	"bytes"
@@ -6,27 +6,26 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
-	"strconv"
 )
 
 type service struct {
 	client *Client
 }
 
-// Client is the campay API client.
+// Client is the neero API client.
 // Do not instantiate this client with Client{}. Use the New method instead.
 type Client struct {
-	httpClient *http.Client
-	common     service
-	baseURL    string
-	delay      int
-
-	Status *statusService
+	common            service
+	httpClient        *http.Client
+	baseURL           string
+	secretKey         string
+	PaymentMethod     *paymentMethodService
+	Balance           *balanceService
+	TransactionIntent *transactionIntentService
 }
 
-// New creates and returns a new campay.Client from a slice of campay.ClientOption.
+// New creates and returns a new neero.Client from a slice of neero.ClientOption.
 func New(options ...Option) *Client {
 	config := defaultClientConfig()
 
@@ -36,19 +35,21 @@ func New(options ...Option) *Client {
 
 	client := &Client{
 		httpClient: config.httpClient,
-		delay:      config.delay,
+		secretKey:  config.secretKey,
 		baseURL:    config.baseURL,
 	}
 
 	client.common.client = client
-	client.Status = (*statusService)(&client.common)
+	client.PaymentMethod = (*paymentMethodService)(&client.common)
+	client.Balance = (*balanceService)(&client.common)
+	client.TransactionIntent = (*transactionIntentService)(&client.common)
 	return client
 }
 
 // newRequest creates an API request. A relative URL can be provided in uri,
 // in which case it is resolved relative to the BaseURL of the Client.
 // URI's should always be specified without a preceding slash.
-func (client *Client) newRequest(ctx context.Context, method, uri string, body interface{}) (*http.Request, error) {
+func (client *Client) newRequest(ctx context.Context, method, uri string, body any) (*http.Request, error) {
 	var buf io.ReadWriter
 	if body != nil {
 		buf = &bytes.Buffer{}
@@ -68,9 +69,7 @@ func (client *Client) newRequest(ctx context.Context, method, uri string, body i
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 
-	if client.delay > 0 {
-		client.addURLParams(req, map[string]string{"sleep": strconv.Itoa(client.delay)})
-	}
+	req.SetBasicAuth(client.secretKey, "")
 
 	return req, nil
 }
@@ -103,7 +102,7 @@ func (client *Client) do(req *http.Request) (*Response, error) {
 		return resp, err
 	}
 
-	_, err = io.Copy(ioutil.Discard, httpResponse.Body)
+	_, err = io.Copy(io.Discard, httpResponse.Body)
 	if err != nil {
 		return resp, err
 	}
@@ -120,7 +119,7 @@ func (client *Client) newResponse(httpResponse *http.Response) (*Response, error
 	resp := new(Response)
 	resp.HTTPResponse = httpResponse
 
-	buf, err := ioutil.ReadAll(resp.HTTPResponse.Body)
+	buf, err := io.ReadAll(resp.HTTPResponse.Body)
 	if err != nil {
 		return nil, err
 	}

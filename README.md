@@ -28,8 +28,15 @@ import "github.com/NdoleStudio/neero-go"
 
 ## Implemented
 
-- [Status Codes](#status-codes)
-    - `GET /200`: OK
+- Payment Methods
+  - `POST /api/v1/payment-methods`: Create Payment Method
+  - `POST /api/v1/payment-methods/resolve-details`: Resolve Payment Method Details
+- Balances
+  - `GET /api/v1/balances/payment-method/{paymentMethodId}`: Get Balance for a Payment Method
+- Transaction Intents
+  - `POST /api/v1/transaction-intents/cash-in`: Create Cash In Payment Intent
+  - `POST /api/v1/transaction-intents/cash-out`: Create Cash Out Payment Intent
+  - `GET /api/v1/transaction-intents/{transactionId}`: Find Transaction Intent By Id
 
 ## Usage
 
@@ -45,7 +52,7 @@ import (
 )
 
 func main()  {
-	statusClient := client.New(client.WithDelay(200))
+	client := neero.New(neero.WithSecretKey("" /*Your Neero merchant account secret key*/))
 }
 ```
 

@@ -1,4 +1,4 @@
-package client
+package neero
 
 import (
 	"bytes"

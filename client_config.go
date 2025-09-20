@@ -1,17 +1,17 @@
-package client
+package neero
 
 import "net/http"
 
 type clientConfig struct {
 	httpClient *http.Client
-	delay      int
+	secretKey  string
 	baseURL    string
 }
 
 func defaultClientConfig() *clientConfig {
 	return &clientConfig{
 		httpClient: http.DefaultClient,
-		delay:      0,
-		baseURL:    "https://httpstat.us",
+		secretKey:  "",
+		baseURL:    "https://api.neero.tech",
 	}
 }
