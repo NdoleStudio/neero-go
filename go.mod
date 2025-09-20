@@ -2,7 +2,7 @@ module github.com/NdoleStudio/neero-go
 
 go 1.24
 
-require github.com/stretchr/testify v1.7.5
+require github.com/stretchr/testify v1.11.1
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
