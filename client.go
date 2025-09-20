@@ -74,16 +74,6 @@ func (client *Client) newRequest(ctx context.Context, method, uri string, body a
 	return req, nil
 }
 
-// addURLParams adds urls parameters to an *http.Request
-func (client *Client) addURLParams(request *http.Request, params map[string]string) *http.Request {
-	q := request.URL.Query()
-	for key, value := range params {
-		q.Add(key, value)
-	}
-	request.URL.RawQuery = q.Encode()
-	return request
-}
-
 // do carries out an HTTP request and returns a Response
 func (client *Client) do(req *http.Request) (*Response, error) {
 	if req == nil {
